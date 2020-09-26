@@ -59,9 +59,17 @@ printf("parent collected child exit value\n");
 
 //method3
 
+void isr(int n)
+{
+printf("in isr because child got terminated\n");
+int status;
+waitpid(-1,&status,WNOHANG);
+}
+
 int main()
 {
 struct sigaction act={
+	.sa_handler=isr,
         .sa_flags=SA_NOCLDWAIT,
 };
 
@@ -71,13 +79,12 @@ sigaction(SIGCHLD,&act,NULL);
 if(fork()==0)
 {
 printf("in child\n");
-sleep(5);
+//sleep(5);
 exit(0);
 }
 else
 {
-        int status;
-waitpid(-1,&status,WNOHANG);
+sleep(5);
 printf("parent collected child exit value\n");
 }
 }
